@@ -24,11 +24,14 @@ class ScraperObject:
 
     # Constructor
     def __init__(self, query):
-        if (self.isQuery(query)):
-            self.query = query
-        else:
-            # TODO: Replace with capability to PM user of exception
+        if (not self.isQuery(query)):
             raise Exception("Not a valid query")
+
+        self.query = query
+        self.rcdbid = self.getRCDBID()
+
+        if (self.rcdbid == -1):
+            raise Exception("Query not found on RCDB")
 
     # Validates that a given string can be a query
     # TODO: Determine what constitutes a valid query
@@ -80,5 +83,31 @@ class ScraperObject:
         if (url.find('qs.htm') == -1):
             return url[17:-4]
 
-testObj = ScraperObject("Lightning Rod")
-print testObj.getRCDBID()
+        # If we get to this point, we may have landed on a page of suggested results
+        resultsTree = html.fromstring(page.content)
+        suggestionPhraseArray = resultsTree.xpath('//div[@id="article"]/div/section/h3/text()')
+
+        # If this is true, then RCDB is suggesting some results
+        if (len(suggestionPhraseArray) != 0):
+            suggestionPhrase = suggestionPhraseArray[0]
+            # Exact match (" Roller Coaster is named "query":)
+            if (suggestionPhrase[:24] == ' Roller Coaster is named'):
+                return resultsTree.xpath('//div[@id="article"]/div/section/p/a')[0].get('href')[1:-4]
+
+            # Close match (" Roller Coaster name contains the phrase" or " Roller Coaster name starts with")
+            if (suggestionPhrase[:40] == ' Roller Coaster name contains the phrase' or suggestionPhrase[:32] == ' Roller Coaster name starts with' or suggestionPhrase[:40] == ' Roller Coaster names contain the phrase' or suggestionPhrase[:32] == ' Roller Coaster names start with'):
+                # TODO: Set up a flag for when a close match was found
+                return resultsTree.xpath('//div[@id="article"]/div/section/p/a')[0].get('href')[1:-4]
+        else:
+            suggestionLinkArray = resultsTree.xpath('//div[@id="article"]/div/p/a/text()')
+
+            # If the size of suggestionLinkArray is nonzero, RCDB is suggesting an alternate spelling of the coaster
+            if (len(suggestionLinkArray) != 0):
+                self.query = suggestionLinkArray[0]
+                return self.getRCDBID()
+            else:
+                return -1
+
+
+testObj = ScraperObject("Dodonpa")
+print testObj.rcdbid
