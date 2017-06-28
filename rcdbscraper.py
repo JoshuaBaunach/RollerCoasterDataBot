@@ -52,6 +52,18 @@ class ScraperObject:
         # Create a coaster object corresponding to the info gathered and return it
         return RollerCoaster(rcdbid, name, park, loc1, loc2, loc3, status, manufacturer, model1, model2)
 
-testObj = ScraperObject("The Smiler")
-anaconda = testObj.scrapeInformation('1896')
-print anaconda.name
+    # Tries to find an RCDBID that corresponds to the object's query.
+    # Input: None
+    # Output: String corresponding to the coaster's RCDBID (will be '0' if no match was found)
+    def getRCDBID(self):
+
+        # Perform a search on RCDB using this object's query variable
+        page = requests.get('https://rcdb.com/qs.htm?qs=' + self.query)
+        url = page.url
+
+        # If the url that was returned is not the RCDB suggested results page, return the RCDBID that was found
+        if (url.find('qs.htm') == -1):
+            return url[17:-4]
+
+testObj = ScraperObject("Lightning Rod")
+print testObj.getRCDBID()
