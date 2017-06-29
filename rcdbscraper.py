@@ -44,12 +44,12 @@ class ScraperObject:
             return True
 
     # Returns some basic information about a roller coaster given its RCDB ID.
-    # Input: String corresponding to the coaster's RCDB ID.
+    # Input: None
     # Output: RollerCoaster object corresponding to the information gathered about the particular coaster.
-    def scrapeInformation(self, rcdbid):
+    def scrapeInformation(self):
 
         # Create an object from the page and extract its content
-        page = requests.get('https://rcdb.com/' + rcdbid + '.htm')
+        page = requests.get('https://rcdb.com/' + self.rcdbid + '.htm')
         tree = html.fromstring(page.content)
 
         # Extract the information we are interested in
@@ -61,14 +61,28 @@ class ScraperObject:
         loc2 = scrollinfo[2]
         loc3 = scrollinfo[3]
 
-        status = tree.xpath('//div[@id="feature"]/a/text()')[0]
+        # Determine the status of the coaster
+        statusArray = tree.xpath('//div[@id="feature"]/a/text()')
+        if (len(statusArray) == 0):
+            status = "Removed"
+        else:
+            status = statusArray[0]
+            if (status == "Operating"):
+                status = "Currently Operating"
+            elif (status == "Operated"):
+                status = "Removed"
 
         manufacturer = scrollinfo[4]
-        model1 = scrollinfo[5]
-        model2 = scrollinfo[6]
+
+        if (len(scrollinfo) > 5):
+            model1 = scrollinfo[5]
+            model2 = scrollinfo[6]
+        else:
+            model1 = None
+            model2 = None
 
         # Create a coaster object corresponding to the info gathered and return it
-        return RollerCoaster(rcdbid, name, park, loc1, loc2, loc3, status, manufacturer, model1, model2)
+        return RollerCoaster(self.rcdbid, name, park, loc1, loc2, loc3, status, manufacturer, model1, model2)
 
     # Tries to find an RCDBID that corresponds to the object's query.
     # Input: None
@@ -91,7 +105,7 @@ class ScraperObject:
         if (len(suggestionPhraseArray) != 0):
             suggestionPhrase = suggestionPhraseArray[0]
             # Exact match (" Roller Coaster is named "query":)
-            if (suggestionPhrase[:24] == ' Roller Coaster is named'):
+            if (suggestionPhrase[:24] == ' Roller Coaster is named' or suggestionPhrase[:25] == ' Roller Coaster are named'):
                 return resultsTree.xpath('//div[@id="article"]/div/section/p/a')[0].get('href')[1:-4]
 
             # Close match (" Roller Coaster name contains the phrase" or " Roller Coaster name starts with")
@@ -109,5 +123,14 @@ class ScraperObject:
                 return -1
 
 
-testObj = ScraperObject("Dodonpa")
-print testObj.rcdbid
+testObj = ScraperObject("Diamondback")
+
+if (testObj.rcdbid != -1):
+    coaster = testObj.scrapeInformation()
+    print coaster.rcdbid
+    print coaster.name
+    print coaster.park
+    print coaster.status
+    print coaster.manufacturer
+    print coaster.model1
+    print coaster.model2
