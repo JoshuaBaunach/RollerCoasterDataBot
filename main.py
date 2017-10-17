@@ -10,15 +10,20 @@ import sys
 def main():
 
     non_api = False
-    # Determine if the program is going to run in non-api mode (i.e. read input from console)
-    if (len(sys.argv) != 1 and sys.argv[1] == '-n'):
-        print 'Running in non-api mode'
-        non_api = True
-        manager = RedditManager(non_api=False)
+    config_name = 'config.json'
 
-    else:
+    # Determine if the program is going to run in non-api mode (i.e. read input from console)
+    if (len(sys.argv) != 1):
+        if ('-n' in sys.argv):
+            print 'Running in non-api mode'
+            non_api = True
+            manager = RedditManager(non_api=False)
+        if ('-c' in sys.argv):
+            config_name = sys.argv[sys.argv.index('-c')+1]
+
+    if ('-n' not in sys.argv):
         # Read from the config file
-        configFile = open('config.json')
+        configFile = open(config_name)
         configJSON = json.load(configFile)
 
         # If no password is provided, prompt for one
