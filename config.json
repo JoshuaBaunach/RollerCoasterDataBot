@@ -1,0 +1,10 @@
+{
+    "username": "[YOUR USERNAME HERE]",
+    "password": "",
+    "clientId": "[YOUR CLIENT ID HERE]",
+    "clientSecret": "[YOUR CLIENT SECRET HERE]",
+    "userAgent": "",
+    "refreshInterval": 2,
+    "refreshRange": 10,
+    "whitelistedSubreddits": ["ManGuyCSSTest"]
+}
