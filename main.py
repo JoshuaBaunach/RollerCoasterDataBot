@@ -45,16 +45,19 @@ def main():
         except Exception as excep:
             print 'Something wrong happened. Trying again :\\'
 
-        time.sleep(10)
+        time.sleep(300)
 
         # Main loop
         while True:
 
             # Check the newest 10 posts for unaccounted queries in each of the whitelisted Subreddits
-            for sub in configJSON['whitelistedSubreddits']:
-                manager.findQueries(sub, 10)
+            try:
+                for sub in configJSON['whitelistedSubreddits']:
+                    manager.findQueries(sub, 10)
+            except Exception as excep:
+                print 'Something wrong happened. Trying again :\\'
 
-            time.sleep(10)
+            time.sleep(300)
     else:
 
         while True:
