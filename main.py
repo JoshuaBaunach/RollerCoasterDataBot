@@ -9,6 +9,12 @@ import sys
 
 def main():
 
+    # Clear the logfile
+    logfile = open('logfile.log', 'w')
+    logfile.write('')
+    logfile.close()
+
+    writeLogfile('Starting Program')
     non_api = False
     config_name = 'config.json'
 
@@ -43,9 +49,9 @@ def main():
             for sub in configJSON['whitelistedSubreddits']:
                 manager.findQueries(sub, 50)
         except Exception as excep:
-            print 'Something wrong happened. Trying again :\\'
+            writeLogfile('Error encountered while searching through comments. Details Below: \n' + excep.message)
 
-        time.sleep(300)
+        time.sleep(60)
 
         # Main loop
         while True:
@@ -55,9 +61,9 @@ def main():
                 for sub in configJSON['whitelistedSubreddits']:
                     manager.findQueries(sub, 10)
             except Exception as excep:
-                print 'Something wrong happened. Trying again :\\'
+                writeLogfile('Error encountered while searching through comments. Details Below: \n' + excep.message)
 
-            time.sleep(300)
+            time.sleep(60)
     else:
 
         while True:
@@ -78,6 +84,17 @@ def main():
                     except Exception as excep:
                         commentText = manager.buildErrorComment(excep.message)
                         print commentText.encode('utf-8')
+
+# Function to write data to the logfile
+def writeLogfile(message):
+    logfile = open('logfile.log', 'a')
+
+    # Get the timestamp
+    timestamp = '[' + time.strftime('%d/%m/%y %H:%M:%S', time.gmtime()) + '] '
+
+    logfile.write(timestamp + message + '\n')
+
+    logfile.close()
 
 
 if __name__ == '__main__':
