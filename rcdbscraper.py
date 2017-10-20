@@ -88,13 +88,18 @@ class ScraperObject:
                 status = unicode(statusArray[0])
                 if (status == "Operated"):
                     status = "Removed"
-            secondScrollLinks = scrollinfo[1].xpath('a/text()')
-            manufacturer = unicode(secondScrollLinks[0])
 
-            if (len(secondScrollLinks) > 1):
-                model1 = unicode(secondScrollLinks[1])
-                model2 = unicode(secondScrollLinks[2])
+            if (len(scrollinfo) > 1):
+                secondScrollLinks = scrollinfo[1].xpath('a/text()')
+                manufacturer = unicode(secondScrollLinks[0])
+                if (len(secondScrollLinks) > 1):
+                    model1 = unicode(secondScrollLinks[1])
+                    model2 = unicode(secondScrollLinks[2])
+                else:
+                    model1 = None
+                    model2 = None
             else:
+                manufacturer = unicode('Not Specified')
                 model1 = None
                 model2 = None
 

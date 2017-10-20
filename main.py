@@ -6,6 +6,7 @@ import json
 import time
 import getpass
 import sys
+import traceback
 
 def main():
 
@@ -84,6 +85,8 @@ def main():
                     except Exception as excep:
                         commentText = manager.buildErrorComment(excep.message)
                         print commentText.encode('utf-8')
+                        print 'Here is what went wrong:'
+                        traceback.print_exc()
 
 # Function to write data to the logfile
 def writeLogfile(message):
